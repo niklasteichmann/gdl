@@ -246,6 +246,13 @@ public class GDLLoader extends GDLBaseListener {
     setLastSeenEdge(e);
   }
 
+
+  @Override
+  public void enterWhereClause(GDLParser.WhereClauseContext whereClauseContext) {
+    for(GDLParser.PredicateContext predicate : whereClauseContext.predicate()){
+    }
+  }
+
   // --------------------------------------------------------------------------------------------
   //  Init handlers
   // --------------------------------------------------------------------------------------------
