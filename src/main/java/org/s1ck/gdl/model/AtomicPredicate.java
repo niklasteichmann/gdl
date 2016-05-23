@@ -42,7 +42,7 @@ public class AtomicPredicate implements Predicate {
   }
 
   public String toString() {
-    return variable + "." + property + " " + type + " " + value;
+    return "[" + variable + "." + property + " " + type + " " + value + "]";
   }
 
   public String toString(int depth) {

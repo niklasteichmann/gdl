@@ -271,7 +271,6 @@ public class GDLLoader extends GDLBaseListener {
       GDLParser.Predicate5Context predicate5 = predicate.predicate5();
       predicates.add(buildPredicate5(predicate5));
     }
-    System.out.println(predicates);
   }
 
   public Predicate buildPredicate5(GDLParser.Predicate5Context predicate5) {

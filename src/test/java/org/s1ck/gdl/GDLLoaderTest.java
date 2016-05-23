@@ -9,6 +9,7 @@ import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Element;
 import org.s1ck.gdl.model.Graph;
 import org.s1ck.gdl.model.GraphElement;
+import org.s1ck.gdl.model.Predicate;
 import org.s1ck.gdl.model.Vertex;
 
 import java.io.IOException;
@@ -26,8 +27,7 @@ public class GDLLoaderTest {
 
   @Test
   public void readVertexTest() {
-    GDLLoader loader = getLoaderFromGDLString("() WHERE " +
-      "NOT((NOT (a.a=1 XOR b.b=1) AND b.b=2) OR b.b=0)");
+    GDLLoader loader = getLoaderFromGDLString("()");
 
     validateCollectionSizes(loader, 0, 1, 0);
     validateCacheSizes(loader, 0, 0, 0);
@@ -350,6 +350,96 @@ public class GDLLoaderTest {
       (Long) v1.getId(), e2.getSourceVertexId());
     assertEquals("edge e2 has wrong target vertex identifier",
       (Long) v2.getId(), e2.getTargetVertexId());
+  }
+
+  //
+  // Predicate tests
+  //
+
+  @Test
+  public void readAtomicPredicatesTest() {
+   GDLLoader loader = getLoaderFromGDLString("() WHERE a.a = 1");
+
+    String expectedPredicateString = "" +
+      "[a.a = 1]";
+
+    String resultPredicateString = "";
+    for(Predicate predicate : loader.getPredicates()){
+      resultPredicateString += predicate.toString();
+    }
+
+    assertEquals(expectedPredicateString, resultPredicateString);
+  }
+
+  @Test
+  public void readUnaryPredicatesTest() {
+    GDLLoader loader = getLoaderFromGDLString("() WHERE NOT a.a = 1");
+
+    String expectedPredicateString = "" +
+      "NOT[\n" +
+      "    [a.a = 1]\n" +
+      "]";
+
+    String resultPredicateString = "";
+    for(Predicate predicate : loader.getPredicates()){
+      resultPredicateString += predicate.toString();
+    }
+
+    assertEquals(expectedPredicateString, resultPredicateString);
+  }
+
+  @Test
+  public void readBinaryPredicatesTest() {
+    GDLLoader loader = getLoaderFromGDLString("() " +
+    "WHERE a.a = 1 OR b.b = 1 AND c.c = 1 XOR a.a = 1");
+
+    String expectedPredicateString = "" +
+      "OR[\n" +
+      "    [a.a = 1]\n" +
+      "    XOR[\n" +
+      "        AND[\n" +
+      "            [b.b = 1]\n" +
+      "            [c.c = 1]\n" +
+      "        ]\n" +
+      "        [a.a = 1]\n" +
+      "    ]\n" +
+      "]";
+
+    String resultPredicateString = "";
+    for(Predicate predicate : loader.getPredicates()){
+      resultPredicateString += predicate.toString();
+    }
+
+    assertEquals(expectedPredicateString, resultPredicateString);
+  }
+
+  @Test
+  public void readPredicatesTest() {
+    GDLLoader loader = getLoaderFromGDLString("() " +
+      "WHERE NOT((NOT (a.a=1 XOR b.b=1) AND b.b=2) OR b.b=0)");
+
+    String expectedPredicateString = "" +
+      "NOT[\n" +
+      "    OR[\n" +
+      "        AND[\n" +
+      "            NOT[\n" +
+      "                XOR[\n" +
+      "                    [a.a = 1]\n" +
+      "                    [b.b = 1]\n" +
+      "                ]\n" +
+      "            ]\n" +
+      "            [b.b = 2]\n" +
+      "        ]\n" +
+      "        [b.b = 0]\n" +
+      "    ]\n" +
+      "]";
+
+    String resultPredicateString = "";
+    for(Predicate predicate : loader.getPredicates()){
+      resultPredicateString += predicate.toString();
+    }
+
+    assertEquals(expectedPredicateString, resultPredicateString);
   }
 
   // --------------------------------------------------------------------------------------------

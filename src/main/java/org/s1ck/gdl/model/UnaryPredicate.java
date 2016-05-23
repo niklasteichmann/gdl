@@ -28,7 +28,7 @@ public class UnaryPredicate implements Predicate{
 
   @Override
   public String toString(){
-    return "\n" + type + "[\n" + child.toString(1) + "\n]";
+    return type + "[\n" + child.toString(1) + "\n]";
   }
 
   public String toString(int depth){

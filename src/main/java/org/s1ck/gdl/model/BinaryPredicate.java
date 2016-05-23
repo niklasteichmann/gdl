@@ -37,7 +37,7 @@ public class BinaryPredicate implements Predicate{
   }
 
   public String toString() {
-    String string = "\n" + type + "[";
+    String string = type + "[";
     for(Predicate child : children) {
       string += "\n" + child.toString(1);
     }
