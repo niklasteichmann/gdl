@@ -20,7 +20,11 @@ grammar GDL;
 
 // starting point for parsing a GDL script
 database
-    : elementList ('WHERE' whereClause)? EOF
+    : elementList (WHERE whereClause)? EOF
+    ;
+
+WHERE
+    : ( 'W' | 'w' ) ( 'H' | 'h' ) ( 'E' | 'e' ) ( 'R' | 'r' ) ( 'E' | 'e' )
     ;
 
 elementList
@@ -82,15 +86,15 @@ predicate
     ;
 
 predicate5
-    : predicate4 (OR predicate4 )*
+    : predicate4 (OR predicate4 )?
     ;
 
 predicate4
-    : predicate3 (XOR predicate3)*
+    : predicate3 (XOR predicate3)?
     ;
 
 predicate3
-    : predicate2 (AND predicate2)*
+    : predicate2 (AND predicate2)?
     ;
 
 predicate2
@@ -123,9 +127,17 @@ parenthesizedPredicate
     ;
 
 atom
-    : Identifier.Identifier '=' literal
+    : Identifier'.'Identifier comparator literal
     ;
 
+comparator
+    : '='
+    | '!='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    ;
 //-------------------------------
 // String Literal
 //-------------------------------

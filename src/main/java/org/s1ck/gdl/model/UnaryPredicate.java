@@ -5,40 +5,39 @@ package org.s1ck.gdl.model;
  */
 public class UnaryPredicate implements Predicate{
 
-  private String variable;
-  private String property;
-  private String relation;
-  private String value;
+  private String type;
+  private Predicate child;
 
-  public String getVariable() {
-    return variable;
+  @Override
+  public String getType() {
+    return type;
   }
 
-  public void setVariable(String variable) {
-    this.variable = variable;
+  @Override
+  public void setType(String type) {
+    this.type = type;
   }
 
-  public String getProperty() {
-    return property;
+  public Predicate getChild() {
+    return child;
   }
 
-  public void setProperty(String property) {
-    this.property = property;
+  public void setChild(Predicate child) {
+    this.child = child;
   }
 
-  public String getRelation() {
-    return relation;
+  @Override
+  public String toString(){
+    return "\n" + type + "[\n" + child.toString(1) + "\n]";
   }
 
-  public void setRelation(String relation) {
-    this.relation = relation;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
+  public String toString(int depth){
+    String indentation = "";
+    for(int i=0;i<depth;i++){
+      indentation += "    ";
+    }
+    return indentation + type + "[\n"
+         + child.toString(depth + 1) + "\n"
+         + indentation + "]";
   }
 }

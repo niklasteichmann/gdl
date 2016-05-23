@@ -26,7 +26,8 @@ public class GDLLoaderTest {
 
   @Test
   public void readVertexTest() {
-    GDLLoader loader = getLoaderFromGDLString("()");
+    GDLLoader loader = getLoaderFromGDLString("() WHERE " +
+      "NOT((NOT (a.a=1 XOR b.b=1) AND b.b=2) OR b.b=0)");
 
     validateCollectionSizes(loader, 0, 1, 0);
     validateCacheSizes(loader, 0, 0, 0);

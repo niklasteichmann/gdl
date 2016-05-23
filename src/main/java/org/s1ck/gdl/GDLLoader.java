@@ -20,12 +20,18 @@ package org.s1ck.gdl;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.s1ck.gdl.model.AtomicPredicate;
+import org.s1ck.gdl.model.BinaryPredicate;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
 import org.s1ck.gdl.model.GraphElement;
+import org.s1ck.gdl.model.Predicate;
+import org.s1ck.gdl.model.UnaryPredicate;
 import org.s1ck.gdl.model.Vertex;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +46,9 @@ public class GDLLoader extends GDLBaseListener {
   private final Set<Graph> graphs;
   private final Set<Vertex> vertices;
   private final Set<Edge> edges;
+
+  // used to hold the element predicates from the where clause
+  private final Set<Predicate> predicates;
 
   private final String defaultGraphLabel;
   private final String defaultVertexLabel;
@@ -77,6 +86,7 @@ public class GDLLoader extends GDLBaseListener {
     graphs = Sets.newHashSet();
     vertices = Sets.newHashSet();
     edges = Sets.newHashSet();
+    predicates = Sets.newHashSet();
   }
 
   /**
@@ -250,6 +260,81 @@ public class GDLLoader extends GDLBaseListener {
   @Override
   public void enterWhereClause(GDLParser.WhereClauseContext whereClauseContext) {
     for(GDLParser.PredicateContext predicate : whereClauseContext.predicate()){
+      GDLParser.Predicate5Context predicate5 = predicate.predicate5();
+      predicates.add(buildPredicate5(predicate5));
+    }
+    System.out.println(predicates);
+  }
+
+  public Predicate buildPredicate5(GDLParser.Predicate5Context predicate5) {
+    if(predicate5.OR() != null){
+      BinaryPredicate orPredicate = new BinaryPredicate();
+      orPredicate.setType("OR");
+      GDLParser.Predicate4Context left = predicate5.predicate4().get(0);
+      GDLParser.Predicate4Context right = predicate5.predicate4().get(1);
+      orPredicate.addChild(buildPredicate4(left));
+      orPredicate.addChild(buildPredicate4(right));
+      return orPredicate;
+    }
+    else{
+      return buildPredicate4(predicate5.predicate4(0));
+    }
+  }
+
+  public Predicate buildPredicate4(GDLParser.Predicate4Context predicate4){
+    if(predicate4.XOR() != null){
+      BinaryPredicate orPredicate = new BinaryPredicate();
+      orPredicate.setType("XOR");
+      GDLParser.Predicate3Context left = predicate4.predicate3().get(0);
+      GDLParser.Predicate3Context right = predicate4.predicate3().get(1);
+      orPredicate.addChild(buildPredicate3(left));
+      orPredicate.addChild(buildPredicate3(right));
+      return orPredicate;
+    }
+    else{
+      return buildPredicate3(predicate4.predicate3(0));
+    }
+  }
+
+  public Predicate buildPredicate3(GDLParser.Predicate3Context predicate3) {
+    if(predicate3.AND() != null){
+      BinaryPredicate orPredicate = new BinaryPredicate();
+      orPredicate.setType("AND");
+      GDLParser.Predicate2Context left = predicate3.predicate2().get(0);
+      GDLParser.Predicate2Context right = predicate3.predicate2().get(1);
+      orPredicate.addChild(buildPredicate2(left));
+      orPredicate.addChild(buildPredicate2(right));
+      return orPredicate;
+    }
+    else{
+      return buildPredicate2(predicate3.predicate2(0));
+    }
+  }
+
+  public Predicate buildPredicate2(GDLParser.Predicate2Context predicate2) {
+    if(predicate2.NOT().size()%2 != 0){
+      UnaryPredicate notPredicate = new UnaryPredicate();
+      notPredicate.setType("NOT");
+      notPredicate.setChild(buildPredicate1(predicate2.predicate1()));
+      return notPredicate;
+    }
+    else{
+      return buildPredicate1(predicate2.predicate1());
+    }
+  }
+
+  public Predicate buildPredicate1(GDLParser.Predicate1Context predicate1) {
+    if(predicate1.parenthesizedPredicate() != null) {
+      return buildPredicate5(
+        predicate1.parenthesizedPredicate().predicate().predicate5());
+    } else {
+      GDLParser.AtomContext atom = predicate1.atom();
+      AtomicPredicate atomicPredicate = new AtomicPredicate();
+      atomicPredicate.setVariable(atom.Identifier().get(0).getText());
+      atomicPredicate.setProperty(atom.Identifier().get(1).getText());
+      atomicPredicate.setValue(atom.literal().getText());
+      atomicPredicate.setType(atom.comparator().getText());
+      return atomicPredicate;
     }
   }
 

@@ -1,35 +1,60 @@
 package org.s1ck.gdl.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by niklas on 18.05.16.
  */
 public class BinaryPredicate implements Predicate{
 
-  private Predicate leftSide;
-  private Predicate rightSide;
-  private String relation;
+  private List<Predicate> children;
+  private String type;
 
-  public Predicate getLeftSide() {
-    return leftSide;
+  public BinaryPredicate(){
+    this.children = new ArrayList<>();
   }
 
-  public void setLeftSide(Predicate leftSide) {
-    this.leftSide = leftSide;
+  public List<Predicate> getChildren() {
+    return children;
   }
 
-  public Predicate getRightSide() {
-    return rightSide;
+  public void setChildren(List<Predicate> children) {
+    this.children = children;
   }
 
-  public void setRightSide(Predicate rightSide) {
-    this.rightSide = rightSide;
+  public void addChild(Predicate child) {
+    this.children.add(child);
   }
 
-  public String getRelation() {
-    return relation;
+
+  public String getType() {
+    return type;
   }
 
-  public void setRelation(String relation) {
-    this.relation = relation;
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String toString() {
+    String string = "\n" + type + "[";
+    for(Predicate child : children) {
+      string += "\n" + child.toString(1);
+    }
+    string += "\n]";
+    return  string;
+  }
+
+  public String toString(int depth){
+    String indentation = "";
+    for(int i=0;i<depth;i++){
+      indentation += "    ";
+    }
+    String string = indentation + type + "[";
+    for(Predicate child : children) {
+      string += "\n" + child.toString(depth + 1);
+    }
+    string += "\n" + indentation + "]";
+    return  string;
   }
 }
