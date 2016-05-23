@@ -147,6 +147,14 @@ public class GDLLoader extends GDLBaseListener {
   }
 
   /**
+   * Returns the set of the most toplevel predicates.
+   * @return set of predicates
+   */
+  public Set<Predicate> getPredicates() {
+    return predicates;
+  }
+
+  /**
    * Called when parser enters a graph context.
    *
    * Checks if the graph has already been created (using its variable). If not, a new graph is
